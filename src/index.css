@@ -7,7 +7,7 @@
   line-height: 1.5;
   font-weight: 400;
   color: #f8fafc;
-  background: #0a1830;
+  background: #062a4d;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -25,12 +25,7 @@
   }
 
   body {
-    @apply min-h-screen bg-[#0a1830] text-slate-100;
-    background-image:
-      radial-gradient(circle at 50% -10%, rgba(96, 165, 250, 0.2), transparent 24%),
-      radial-gradient(circle at 0% 10%, rgba(56, 189, 248, 0.14), transparent 24%),
-      radial-gradient(circle at 100% 0%, rgba(59, 130, 246, 0.12), transparent 18%),
-      linear-gradient(180deg, #0b1b35 0%, #0c2244 36%, #091321 100%);
+    @apply min-h-screen bg-[#062a4d] text-slate-100;
   }
 
   #root {
@@ -43,4 +38,58 @@
     font-family: "Aldrich", "Bahnschrift", "Trebuchet MS", sans-serif;
     letter-spacing: -0.03em;
   }
+}
+
+/* Leaflet 深蓝海洋底图色调（贴近参考图） */
+.ocean-basemap-tiles {
+  filter: hue-rotate(195deg) saturate(1.35) brightness(0.78) contrast(1.08);
+}
+
+.leaflet-container {
+  background: #0b3a6b !important;
+  font-family: inherit;
+}
+
+.leaflet-control-attribution {
+  display: none;
+}
+
+/* 城市红点标记 */
+.city-marker-icon {
+  background: transparent !important;
+  border: none !important;
+}
+
+.city-marker {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.city-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #ef4444;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.35), 0 2px 8px rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
+}
+
+.city-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow:
+    0 1px 2px rgba(8, 30, 60, 0.85),
+    0 0 8px rgba(8, 40, 80, 0.55);
+  letter-spacing: 0.02em;
+}
+
+.leaflet-tooltip {
+  border: none !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 30px rgba(8, 30, 60, 0.25) !important;
+  padding: 8px 10px !important;
 }

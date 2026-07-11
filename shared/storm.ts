@@ -98,7 +98,7 @@ export interface LiveStormsResponse {
     highestWarningLevel: string
     nextLandfallWindow: string
   }
-  storms: StormSummary[]
+  storms: StormDetail[]
   hangzhouWeather?: WeatherSnapshot
   windVectors?: WindVectorPoint[]
   hangzhouTimeline?: WeatherTimelinePoint[]

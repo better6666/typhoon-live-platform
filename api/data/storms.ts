@@ -501,7 +501,7 @@ export async function getLiveStorms(): Promise<LiveStormsResponse> {
       highestWarningLevel: bundle.hangzhouWeather.windGustKmh >= 60 ? '黄色' : '蓝色',
       nextLandfallWindow: '今夜至明晨',
     },
-    storms: bundle.liveStorms.map(toSummary),
+    storms: bundle.liveStorms,
     hangzhouWeather: bundle.hangzhouWeather,
     windVectors: bundle.windVectors,
     hangzhouTimeline: bundle.hangzhouTimeline,

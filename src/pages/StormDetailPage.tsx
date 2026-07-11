@@ -106,7 +106,7 @@ export default function StormDetailPage() {
           showForecast
           showWindCircle
           windVectors={storm.windVectors}
-          baseMap="satellite"
+          baseMap="ocean"
         />
         <IntensityChart points={storm.points} />
       </section>

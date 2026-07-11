@@ -217,13 +217,22 @@ function createFallbackLiveBundle(): LiveBundle {
     { time: '2026-07-11T20:00:00+08:00', windSpeedKmh: 28, windDirectionDeg: 32, windGustKmh: 66, pressureHpa: 996, precipitationMm: 4.6 },
     { time: '2026-07-11T21:00:00+08:00', windSpeedKmh: 31, windDirectionDeg: 28, windGustKmh: 70, pressureHpa: 995, precipitationMm: 5.1 },
   ]
-  const windVectors: WindVectorPoint[] = [
-    { lat: 28.9, lng: 119.1, windSpeedKmh: 22, windDirectionDeg: 70, windGustKmh: 42 },
-    { lat: 29.9, lng: 119.7, windSpeedKmh: 22, windDirectionDeg: 70, windGustKmh: 42 },
-    { lat: 30.3, lng: 120.2, windSpeedKmh: 28, windDirectionDeg: 60, windGustKmh: 55 },
-    { lat: 30.8, lng: 120.8, windSpeedKmh: 24, windDirectionDeg: 48, windGustKmh: 47 },
-    { lat: 31.4, lng: 121.5, windSpeedKmh: 30, windDirectionDeg: 40, windGustKmh: 62 },
-  ]
+  // 更密的风场采样，便于粒子流可视化
+  const windVectors: WindVectorPoint[] = []
+  for (let lat = 24; lat <= 34; lat += 1.2) {
+    for (let lng = 116; lng <= 128; lng += 1.4) {
+      const distToEye = Math.hypot(lat - 26.7, lng - 123.3)
+      const spiralBoost = Math.max(0, 95 - distToEye * 12)
+      const baseDir = 55 + (lng - 120) * 3
+      windVectors.push({
+        lat,
+        lng,
+        windSpeedKmh: 14 + spiralBoost * 0.55 + Math.random() * 6,
+        windDirectionDeg: (baseDir + distToEye * 25) % 360,
+        windGustKmh: 28 + spiralBoost * 0.75,
+      })
+    }
+  }
   const fallbackStorm: StormDetail = {
     id: 'BAVI-2026',
     nameCn: '巴威',
@@ -482,7 +491,7 @@ export async function getLiveStorms(): Promise<LiveStormsResponse> {
       highestWarningLevel: bundle.hangzhouWeather.windGustKmh >= 60 ? '黄色' : '蓝色',
       nextLandfallWindow: '今夜至明晨',
     },
-    storms: bundle.liveStorms.map(toSummary),
+    storms: bundle.liveStorms,
     hangzhouWeather: bundle.hangzhouWeather,
     windVectors: bundle.windVectors,
     hangzhouTimeline: bundle.hangzhouTimeline,
