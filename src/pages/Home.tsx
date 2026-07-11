@@ -15,10 +15,12 @@ const layerText = {
 } as const
 
 const baseMapOptions = [
-  { key: 'ocean' as const, label: '海洋风场' },
+  { key: 'ocean' as const, label: '真实海洋' },
+  { key: 'hybrid' as const, label: '卫星混合' },
+  { key: 'terrain' as const, label: '地形图' },
   { key: 'dark' as const, label: '深色夜航' },
   { key: 'street' as const, label: '街道' },
-  { key: 'satellite' as const, label: '卫星' },
+  { key: 'satellite' as const, label: '纯卫星' },
 ]
 
 export default function Home() {
@@ -157,7 +159,13 @@ export default function Home() {
           </button>
           <button
             type="button"
-            onClick={() => setBaseMap((prev) => (prev === 'ocean' ? 'dark' : 'ocean'))}
+            onClick={() =>
+              setBaseMap((prev) => {
+                const order = ['ocean', 'hybrid', 'terrain', 'dark', 'street', 'satellite'] as const
+                const idx = order.indexOf(prev)
+                return order[(idx + 1) % order.length]
+              })
+            }
             className="flex h-11 w-11 items-center justify-center rounded-full border border-white/40 bg-[rgba(220,235,250,0.92)] text-[#1a4a7a] shadow-lg backdrop-blur-md transition hover:bg-white"
             aria-label="切换底图"
             title="切换底图"
@@ -205,7 +213,7 @@ export default function Home() {
                   key={option.key}
                   type="button"
                   onClick={() => setBaseMap(option.key)}
-                  className={`rounded-xl px-2 py-2 text-xs transition ${
+                  className={`rounded-xl px-2 py-2 text-[11px] transition ${
                     baseMap === option.key
                       ? 'bg-[#1a4a7a] text-white'
                       : 'bg-white/70 text-[#2a5f8f] hover:bg-white'

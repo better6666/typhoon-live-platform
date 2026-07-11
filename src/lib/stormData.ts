@@ -46,14 +46,16 @@ interface PanahonCyclone {
 }
 
 interface OpenMeteoResponse {
+  latitude?: number
+  longitude?: number
   current: {
     time: string
     wind_speed_10m: number
     wind_direction_10m: number
     wind_gusts_10m: number
-    pressure_msl: number
+    pressure_msl?: number
   }
-  hourly: {
+  hourly?: {
     time: string[]
     wind_speed_10m: number[]
     wind_direction_10m: number[]
@@ -290,6 +292,7 @@ async function fetchWeather(lat = HANGZHOU.lat, lng = HANGZHOU.lng, name = HANGZ
     '&current=wind_speed_10m,wind_direction_10m,wind_gusts_10m,pressure_msl' +
     '&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,pressure_msl,precipitation&forecast_hours=8&timezone=Asia%2FShanghai'
   const data = await requestJson<OpenMeteoResponse>(url)
+  const hourly = data.hourly
   return {
     snapshot: {
       name,
@@ -299,49 +302,87 @@ async function fetchWeather(lat = HANGZHOU.lat, lng = HANGZHOU.lng, name = HANGZ
       windSpeedKmh: data.current.wind_speed_10m,
       windDirectionDeg: data.current.wind_direction_10m,
       windGustKmh: data.current.wind_gusts_10m,
-      pressureHpa: data.current.pressure_msl,
+      pressureHpa: data.current.pressure_msl ?? 1010,
     } satisfies WeatherSnapshot,
-    timeline: data.hourly.time.map((time, index) => ({
+    timeline: (hourly?.time ?? []).map((time, index) => ({
       time: `${time}:00+08:00`,
-      windSpeedKmh: data.hourly.wind_speed_10m[index],
-      windDirectionDeg: data.hourly.wind_direction_10m[index],
-      windGustKmh: data.hourly.wind_gusts_10m[index],
-      pressureHpa: data.hourly.pressure_msl?.[index],
-      precipitationMm: data.hourly.precipitation?.[index],
+      windSpeedKmh: hourly!.wind_speed_10m[index],
+      windDirectionDeg: hourly!.wind_direction_10m[index],
+      windGustKmh: hourly!.wind_gusts_10m[index],
+      pressureHpa: hourly!.pressure_msl?.[index],
+      precipitationMm: hourly!.precipitation?.[index],
     })) satisfies WeatherTimelinePoint[],
   }
 }
 
-async function fetchWindVectors() {
-  const coords = [
-    [28.6, 119.0],
-    [28.9, 120.1],
-    [29.2, 121.2],
-    [29.5, 122.1],
-    [29.8, 119.2],
-    [30.1, 120.1],
-    [30.4, 121.0],
-    [30.7, 121.9],
-    [31.0, 119.3],
-    [31.2, 120.2],
-    [31.4, 121.1],
-    [31.6, 122.0],
-  ]
+function buildWindGridCoords() {
+  const coords: Array<[number, number]> = []
+  // 华东—东海—黄海更密网格，兼顾台湾与日本近海
+  for (let lat = 22; lat <= 36; lat += 1.25) {
+    for (let lng = 115; lng <= 130; lng += 1.4) {
+      coords.push([Number(lat.toFixed(2)), Number(lng.toFixed(2))])
+    }
+  }
+  return coords
+}
 
-  const result = await Promise.all(
-    coords.map(async ([lat, lng]) => {
-      const { snapshot } = await fetchWeather(lat, lng, `${lat.toFixed(1)},${lng.toFixed(1)}`)
-      return {
-        lat,
-        lng,
-        windSpeedKmh: snapshot.windSpeedKmh,
-        windDirectionDeg: snapshot.windDirectionDeg,
-        windGustKmh: snapshot.windGustKmh,
-      } satisfies WindVectorPoint
-    }),
-  )
+async function fetchWindVectors(): Promise<WindVectorPoint[]> {
+  const coords = buildWindGridCoords()
+  // Open-Meteo 支持多点批量，减少请求次数
+  const chunkSize = 40
+  const chunks: Array<Array<[number, number]>> = []
+  for (let i = 0; i < coords.length; i += chunkSize) {
+    chunks.push(coords.slice(i, i + chunkSize))
+  }
 
-  return result
+  const all: WindVectorPoint[] = []
+
+  for (const chunk of chunks) {
+    const latitudes = chunk.map(([lat]) => lat).join(',')
+    const longitudes = chunk.map(([, lng]) => lng).join(',')
+    const url =
+      `https://api.open-meteo.com/v1/forecast?latitude=${latitudes}&longitude=${longitudes}` +
+      '&current=wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=Asia%2FShanghai'
+
+    try {
+      const data = await requestJson<
+        | OpenMeteoResponse
+        | Array<OpenMeteoResponse & { latitude?: number; longitude?: number }>
+      >(url)
+
+      const list = Array.isArray(data) ? data : [data]
+      list.forEach((item, index) => {
+        const [lat, lng] = chunk[index] ?? [item.latitude ?? 0, item.longitude ?? 0]
+        if (!item.current) return
+        all.push({
+          lat,
+          lng,
+          windSpeedKmh: item.current.wind_speed_10m,
+          windDirectionDeg: item.current.wind_direction_10m,
+          windGustKmh: item.current.wind_gusts_10m,
+        })
+      })
+    } catch {
+      // 单块失败则跳过，保留其他块
+    }
+  }
+
+  if (all.length >= 8) return all
+
+  // 兜底：用杭州实况生成区域风场
+  const { snapshot } = await fetchWeather()
+  return coords.map(([lat, lng]) => {
+    const dLat = lat - HANGZHOU.lat
+    const dLng = lng - HANGZHOU.lng
+    const dist = Math.hypot(dLat, dLng)
+    return {
+      lat,
+      lng,
+      windSpeedKmh: Math.max(8, snapshot.windSpeedKmh * (1 - dist * 0.04) + dist * 2),
+      windDirectionDeg: (snapshot.windDirectionDeg + dist * 18) % 360,
+      windGustKmh: Math.max(12, snapshot.windGustKmh * (1 - dist * 0.03)),
+    }
+  })
 }
 
 async function fetchLiveStormsFromPanahon(hangzhouWeather: WeatherSnapshot, windVectors: WindVectorPoint[]) {
