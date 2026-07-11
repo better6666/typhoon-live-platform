@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "IBM Plex Sans", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #f8fafc;
+  background: #050816;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+  * {
+    @apply border-slate-800;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply min-h-screen bg-[#050816] text-slate-100;
+    background-image:
+      radial-gradient(circle at 20% 0%, rgba(34, 211, 238, 0.08), transparent 26%),
+      radial-gradient(circle at 100% 10%, rgba(249, 115, 22, 0.08), transparent 22%);
+  }
+
+  #root {
+    @apply min-h-screen;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: "Aldrich", "Bahnschrift", "Trebuchet MS", sans-serif;
+    letter-spacing: -0.03em;
+  }
+}
