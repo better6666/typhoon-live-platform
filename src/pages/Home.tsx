@@ -67,156 +67,189 @@ export default function Home() {
   }
 
   return (
-    <div className="space-y-8">
-      <section className="grid gap-6 xl:grid-cols-[1.45fr_0.55fr]">
-        <div className="rounded-[32px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.2),transparent_32%),radial-gradient(circle_at_top_right,rgba(249,115,22,0.16),transparent_25%),rgba(7,10,24,0.88)] p-8 shadow-[0_30px_80px_rgba(5,10,25,0.45)]">
-          <div className="flex items-end justify-between gap-6">
+    <div className="space-y-5 sm:space-y-6">
+      <section className="overflow-hidden rounded-[36px] border border-white/12 bg-[linear-gradient(180deg,rgba(122,187,255,0.18),rgba(255,255,255,0.08))] p-5 shadow-[0_22px_60px_rgba(5,18,42,0.22)] backdrop-blur-2xl sm:p-7">
+        <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+          <div className="space-y-5">
+            <div className="inline-flex items-center rounded-full border border-white/16 bg-white/10 px-3 py-1.5 text-[11px] uppercase tracking-[0.24em] text-sky-50/82">
+              Hangzhou Typhoon Monitor
+            </div>
             <div>
-              <div className="text-xs uppercase tracking-[0.42em] text-cyan-100/55">Typhoon Observatory Deck</div>
-              <h1 className="mt-4 max-w-3xl font-display text-5xl leading-[1.05] text-white">
-                台风路径实时可视化平台
+              <h1 className="max-w-3xl font-display text-[2.2rem] leading-[1.02] text-white sm:text-5xl lg:text-[4.2rem]">
+                杭州台风影响
+                <br />
+                实时观测平台
               </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300">
-                将活跃台风、风圈扩展、登陆窗口与沿海预警态势叠加到统一指挥舱视图中，支持一键转入详情回放与历史复盘。
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-sky-50/78 sm:text-base">
+                用一套更像气象产品的界面，把台风路径、杭州实时风速、阵风、预警与未来数小时影响整合到同一个页面里。
               </p>
             </div>
-            <div className="rounded-[24px] border border-cyan-300/20 bg-cyan-300/10 px-5 py-4 text-right">
-              <div className="text-xs uppercase tracking-[0.26em] text-cyan-100/50">最新同步</div>
-              <div className="mt-2 font-display text-3xl text-white">+5 分钟</div>
-              <div className="mt-1 text-sm text-cyan-50/70">{new Date(liveData.updatedAt).toLocaleString('zh-CN')}</div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-[28px] bg-[rgba(7,28,55,0.38)] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+                <div className="text-xs text-sky-100/64">杭州实时风速</div>
+                <div className="mt-2 font-display text-3xl text-white">{Math.round(liveData.hangzhouWeather?.windSpeedKmh ?? 0)}</div>
+                <div className="mt-1 text-sm text-sky-50/72">km/h</div>
+              </div>
+              <div className="rounded-[28px] bg-[rgba(7,28,55,0.38)] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+                <div className="text-xs text-sky-100/64">杭州实时阵风</div>
+                <div className="mt-2 font-display text-3xl text-white">{Math.round(liveData.hangzhouWeather?.windGustKmh ?? 0)}</div>
+                <div className="mt-1 text-sm text-sky-50/72">km/h</div>
+              </div>
+              <div className="rounded-[28px] bg-[rgba(7,28,55,0.38)] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+                <div className="text-xs text-sky-100/64">海平面气压</div>
+                <div className="mt-2 font-display text-3xl text-white">{liveData.hangzhouWeather?.pressureHpa ?? '--'}</div>
+                <div className="mt-1 text-sm text-sky-50/72">hPa</div>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2.5">
+              <div className="rounded-full border border-white/14 bg-white/10 px-4 py-2 text-sm text-sky-50/82">
+                已同步 {new Date(liveData.updatedAt).toLocaleString('zh-CN')}
+              </div>
+              <div className="rounded-full border border-white/14 bg-white/10 px-4 py-2 text-sm text-sky-50/82">
+                当前最强 {liveData.summary.strongestStormName}
+              </div>
+              <div className="rounded-full border border-white/14 bg-white/10 px-4 py-2 text-sm text-sky-50/82">
+                最高预警 {liveData.summary.highestWarningLevel}
+              </div>
             </div>
           </div>
-        </div>
-        <div className="rounded-[32px] border border-amber-300/15 bg-[linear-gradient(160deg,rgba(249,115,22,0.18),rgba(12,18,38,0.84))] p-8 shadow-[0_20px_60px_rgba(249,115,22,0.12)]">
-          <div className="text-xs uppercase tracking-[0.26em] text-amber-100/55">预警焦点</div>
-          <div className="mt-4 font-display text-4xl text-white">{warningData.highestLevel}</div>
-          <p className="mt-3 text-sm leading-7 text-slate-200">{warningData.coastalFocus}</p>
-          <div className="mt-6 space-y-3">
-            {warningData.items.slice(0, 3).map((item) => (
-              <div key={`${item.region}-${item.level}`} className="rounded-[20px] border border-white/10 bg-black/15 p-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-white">{item.region}</span>
-                  <span className="rounded-full border border-amber-200/15 bg-amber-300/10 px-2.5 py-1 text-xs text-amber-100">
-                    {item.level}
-                  </span>
+
+          <div className="grid gap-4">
+            <div className="rounded-[30px] border border-white/12 bg-[linear-gradient(180deg,rgba(255,255,255,0.14),rgba(255,255,255,0.05))] p-5 backdrop-blur-xl">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <div className="text-[11px] uppercase tracking-[0.24em] text-sky-100/60">预警焦点</div>
+                  <div className="mt-3 font-display text-4xl text-white">{warningData.highestLevel}</div>
                 </div>
-                <p className="mt-2 text-sm leading-6 text-slate-300">{item.message}</p>
+                <div className="rounded-full border border-amber-200/20 bg-amber-200/12 px-3 py-1 text-xs text-amber-50">
+                  {warningData.coastalFocus}
+                </div>
               </div>
-            ))}
+              <div className="mt-4 space-y-3">
+                {warningData.items.slice(0, 2).map((item) => (
+                  <div key={`${item.region}-${item.level}`} className="rounded-[22px] bg-[rgba(9,27,50,0.52)] p-4">
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="text-sm font-medium text-white">{item.region}</span>
+                      <span className="rounded-full border border-white/10 bg-white/10 px-2.5 py-1 text-xs text-slate-100/84">
+                        {item.level}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-sm leading-6 text-slate-200/82">{item.message}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="rounded-[30px] border border-white/12 bg-[linear-gradient(180deg,rgba(255,255,255,0.14),rgba(255,255,255,0.05))] p-5 backdrop-blur-xl">
+              <div className="text-[11px] uppercase tracking-[0.24em] text-sky-100/60">台风焦点</div>
+              <div className="mt-3 text-2xl font-semibold text-white">{activeStorm?.nameCn}</div>
+              <div className="mt-1 text-xs uppercase tracking-[0.2em] text-slate-200/56">{activeStorm?.nameEn}</div>
+              <p className="mt-4 text-sm leading-7 text-slate-100/82">
+                {activeStorm?.landfallNarrative ?? '正在汇总最新路径与杭州影响说明。'}
+              </p>
+              {activeStorm && (
+                <Link
+                  to={`/storm/${activeStorm.id}`}
+                  className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-white/90 px-4 py-3 text-sm font-medium text-sky-950 transition hover:bg-white"
+                >
+                  进入台风详情页
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </section>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <MetricCard label="活跃台风" value={`${liveData.summary.activeCount}`} hint="当前可追踪系统数量" icon={<Radar className="h-5 w-5" />} />
+        <MetricCard label="活跃台风" value={`${liveData.summary.activeCount}`} hint="当前追踪中的活跃系统数量" icon={<Radar className="h-5 w-5" />} />
         <MetricCard label="最强系统" value={liveData.summary.strongestStormName} hint="当前海域最强台风名称" icon={<Gauge className="h-5 w-5" />} />
-        <MetricCard label="最高预警" value={liveData.summary.highestWarningLevel} hint="沿海地区最高生效等级" icon={<AlertTriangle className="h-5 w-5" />} />
+        <MetricCard label="最高预警" value={liveData.summary.highestWarningLevel} hint="沿海地区当前最高生效等级" icon={<AlertTriangle className="h-5 w-5" />} />
         <MetricCard
           label="杭州实时阵风"
           value={`${Math.round(liveData.hangzhouWeather?.windGustKmh ?? 0)} km/h`}
-          hint={`海平面气压 ${liveData.hangzhouWeather?.pressureHpa ?? '--'} hPa`}
+          hint={`风向 ${liveData.hangzhouWeather?.windDirectionDeg ?? '--'}° · 气压 ${liveData.hangzhouWeather?.pressureHpa ?? '--'} hPa`}
           icon={<MapPinned className="h-5 w-5" />}
         />
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[0.95fr_1.55fr_0.7fr]">
-        <div className="rounded-[28px] border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
-          <div className="mb-4 flex items-center justify-between">
+      <section className="grid gap-5 xl:grid-cols-[0.92fr_1.08fr]">
+        <div className="rounded-[32px] border border-white/12 bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.05))] p-5 shadow-[0_18px_48px_rgba(6,18,40,0.16)] backdrop-blur-2xl sm:p-6">
+          <div className="mb-4 flex items-center justify-between gap-4">
             <div>
-              <div className="text-xs uppercase tracking-[0.24em] text-cyan-100/55">活跃台风列表</div>
+              <div className="text-[11px] uppercase tracking-[0.24em] text-sky-100/60">活跃台风列表</div>
               <div className="mt-2 text-xl font-semibold text-white">快速锁定目标台风</div>
             </div>
-            <TimerReset className="h-5 w-5 text-cyan-200" />
+            <TimerReset className="h-5 w-5 text-sky-100/78" />
           </div>
           <StormList storms={liveData.storms} activeStormId={activeStorm?.id} onSelectStorm={setSelectedStormId} />
         </div>
 
         <div className="space-y-4">
-          <div className="flex flex-wrap gap-3">
-            {Object.entries(layerText).map(([key, label]) => {
-              const enabled = { showForecast, showWindCircle, showWarnings }[key as keyof typeof layerText]
+          <div className="rounded-[32px] border border-white/12 bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.05))] p-4 shadow-[0_18px_48px_rgba(6,18,40,0.16)] backdrop-blur-2xl sm:p-5">
+            <div className="mb-4 flex flex-wrap gap-2.5">
+              {Object.entries(layerText).map(([key, label]) => {
+                const enabled = { showForecast, showWindCircle, showWarnings }[key as keyof typeof layerText]
 
-              return (
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => toggleLayer(key as keyof typeof layerText)}
+                    className={`rounded-full border px-4 py-2 text-sm transition ${
+                      enabled
+                        ? 'border-sky-200/30 bg-white/14 text-white'
+                        : 'border-white/10 bg-white/6 text-slate-200/72 hover:text-white'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                )
+              })}
+              {baseMapOptions.map((option) => (
                 <button
-                  key={key}
+                  key={option.key}
                   type="button"
-                  onClick={() => toggleLayer(key as keyof typeof layerText)}
+                  onClick={() => setBaseMap(option.key)}
                   className={`rounded-full border px-4 py-2 text-sm transition ${
-                    enabled
-                      ? 'border-cyan-300/40 bg-cyan-300/12 text-cyan-100'
-                      : 'border-white/10 bg-white/5 text-slate-400 hover:text-white'
+                    baseMap === option.key
+                      ? 'border-cyan-200/32 bg-cyan-100/12 text-cyan-50'
+                      : 'border-white/10 bg-white/6 text-slate-200/72 hover:text-white'
                   }`}
                 >
-                  {label}
+                  {option.label}
                 </button>
-              )
-            })}
-            {baseMapOptions.map((option) => (
-              <button
-                key={option.key}
-                type="button"
-                onClick={() => setBaseMap(option.key)}
-                className={`rounded-full border px-4 py-2 text-sm transition ${
-                  baseMap === option.key
-                    ? 'border-amber-300/45 bg-amber-300/12 text-amber-100'
-                    : 'border-white/10 bg-white/5 text-slate-400 hover:text-white'
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
+              ))}
+            </div>
+            <StormMap
+              storms={liveData.storms}
+              activeStormId={activeStorm?.id}
+              showForecast={showForecast}
+              showWindCircle={showWindCircle}
+              windVectors={liveData.windVectors}
+              baseMap={baseMap}
+              onSelectStorm={setSelectedStormId}
+            />
           </div>
-          <StormMap
-            storms={liveData.storms}
-            activeStormId={activeStorm?.id}
-            showForecast={showForecast}
-            showWindCircle={showWindCircle}
-            windVectors={liveData.windVectors}
-            baseMap={baseMap}
-            onSelectStorm={setSelectedStormId}
-          />
-        </div>
 
-        <div className="space-y-4 rounded-[28px] border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
-          <div>
-            <div className="text-xs uppercase tracking-[0.24em] text-cyan-100/55">台风焦点</div>
-            <div className="mt-2 text-xl font-semibold text-white">{activeStorm?.nameCn}</div>
-            <div className="mt-1 text-sm uppercase tracking-[0.2em] text-slate-400">{activeStorm?.nameEn}</div>
-          </div>
-          <div className="grid gap-3">
-            <div className="rounded-[24px] bg-slate-950/35 p-4">
-              <div className="text-xs text-slate-400">当前位置</div>
-              <div className="mt-1 text-white">
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="rounded-[28px] border border-white/12 bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.05))] p-5 backdrop-blur-2xl">
+              <div className="text-xs text-slate-300/68">当前位置</div>
+              <div className="mt-2 text-base font-medium text-white">
                 {activeStorm?.latestPoint.lat.toFixed(1)}°N / {activeStorm?.latestPoint.lng.toFixed(1)}°E
               </div>
             </div>
-            <div className="rounded-[24px] bg-slate-950/35 p-4">
-              <div className="text-xs text-slate-400">移动方向</div>
-              <div className="mt-1 text-white">
+            <div className="rounded-[28px] border border-white/12 bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.05))] p-5 backdrop-blur-2xl">
+              <div className="text-xs text-slate-300/68">移动方向</div>
+              <div className="mt-2 text-base font-medium text-white">
                 {activeStorm?.latestPoint.moveDir} · {activeStorm?.latestPoint.moveSpeedKmh} km/h
               </div>
             </div>
-            <div className="rounded-[24px] bg-slate-950/35 p-4">
-              <div className="text-xs text-slate-400">杭州实时风速</div>
-              <div className="mt-1 text-white">
+            <div className="rounded-[28px] border border-white/12 bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.05))] p-5 backdrop-blur-2xl">
+              <div className="text-xs text-slate-300/68">杭州实时风速</div>
+              <div className="mt-2 text-base font-medium text-white">
                 {Math.round(liveData.hangzhouWeather?.windSpeedKmh ?? 0)} km/h · {liveData.hangzhouWeather?.windDirectionDeg ?? '--'}°
               </div>
             </div>
           </div>
-          <div className="rounded-[24px] border border-white/10 bg-black/10 p-4 text-sm leading-7 text-slate-300">
-            {showWarnings ? warningData.items[0]?.message : '已关闭预警态势图层，可重新开启查看沿海预警。'}
-          </div>
-          <div className="rounded-[24px] border border-cyan-300/15 bg-cyan-300/8 p-4 text-sm leading-7 text-slate-200">
-            {activeStorm?.landfallNarrative ?? '正在汇总最新登陆研判。'}
-          </div>
-          {activeStorm && (
-            <Link
-              to={`/storm/${activeStorm.id}`}
-              className="inline-flex w-full items-center justify-center rounded-full bg-cyan-300 px-4 py-3 text-sm font-medium text-slate-950 transition hover:bg-cyan-200"
-            >
-              进入台风详情页
-            </Link>
-          )}
         </div>
       </section>
 

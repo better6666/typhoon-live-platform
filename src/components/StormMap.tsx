@@ -241,7 +241,7 @@ export default function StormMap({
   }, [storms, activeStormId, showForecast, showWindCircle, windVectors, onSelectStorm])
 
   return (
-    <div className="h-[520px] overflow-hidden rounded-[28px] border border-white/10 bg-slate-950/50 shadow-[0_30px_80px_rgba(10,18,40,0.45)]">
+    <div className="h-[360px] overflow-hidden rounded-[28px] border border-white/10 bg-slate-950/50 shadow-[0_30px_80px_rgba(10,18,40,0.45)] sm:h-[430px] xl:h-[520px]">
       <div ref={containerRef} className="h-full w-full" />
     </div>
   )

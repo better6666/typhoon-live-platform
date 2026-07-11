@@ -7,7 +7,7 @@
   line-height: 1.5;
   font-weight: 400;
   color: #f8fafc;
-  background: #050816;
+  background: #0a1830;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -25,10 +25,12 @@
   }
 
   body {
-    @apply min-h-screen bg-[#050816] text-slate-100;
+    @apply min-h-screen bg-[#0a1830] text-slate-100;
     background-image:
-      radial-gradient(circle at 20% 0%, rgba(34, 211, 238, 0.08), transparent 26%),
-      radial-gradient(circle at 100% 10%, rgba(249, 115, 22, 0.08), transparent 22%);
+      radial-gradient(circle at 50% -10%, rgba(96, 165, 250, 0.2), transparent 24%),
+      radial-gradient(circle at 0% 10%, rgba(56, 189, 248, 0.14), transparent 24%),
+      radial-gradient(circle at 100% 0%, rgba(59, 130, 246, 0.12), transparent 18%),
+      linear-gradient(180deg, #0b1b35 0%, #0c2244 36%, #091321 100%);
   }
 
   #root {
